@@ -1,0 +1,16 @@
+server:
+  port: 8081
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/food_menu
+  cache:
+    type: none
+  jpa:
+    show-sql: true

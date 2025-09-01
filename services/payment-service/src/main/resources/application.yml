@@ -1,0 +1,19 @@
+server:
+  port: 8084
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/paymentdb
+    username: app
+    password: pass
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+kafka:
+  bootstrap-servers: localhost:9092

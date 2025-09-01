@@ -1,0 +1,23 @@
+server:
+  port: 8085
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,prometheus"
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/deliverydb
+    username: app
+    password: pass
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  data:
+    redis:
+      host: localhost
+      port: 6379
+kafka:
+  bootstrap-servers: localhost:9092
