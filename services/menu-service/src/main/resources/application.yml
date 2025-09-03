@@ -10,7 +10,12 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/food_menu
+      auto-index-creation: true
+      uuid-representation: standard
   cache:
     type: none
   jpa:
     show-sql: true
+mongock:
+  enabled: true
+  migration-scan-package: com.foodapp.menu.db.changelog
