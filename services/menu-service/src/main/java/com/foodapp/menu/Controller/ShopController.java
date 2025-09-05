@@ -54,7 +54,5 @@ public class ShopController {
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
-
     }
-
 }
