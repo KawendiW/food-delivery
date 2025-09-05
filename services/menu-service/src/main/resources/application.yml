@@ -19,3 +19,6 @@ spring:
 mongock:
   enabled: true
   migration-scan-package: com.foodapp.menu.db.changelog
+
+api:
+  base-path: /api/v1
