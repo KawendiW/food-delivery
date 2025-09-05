@@ -1,5 +1,6 @@
 package com.foodapp.menu.Service.Impl;
 
+import com.foodapp.menu.Controller.DTO.PageResponse;
 import com.foodapp.menu.Controller.DTO.ShopCreateRequest;
 import com.foodapp.menu.Controller.DTO.ShopSummaryResponse;
 import com.foodapp.menu.Controller.DTO.ShopUpdateRequest;
@@ -9,6 +10,8 @@ import com.foodapp.menu.Repository.ShopRepository;
 import com.foodapp.menu.Service.ShopService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -38,7 +41,7 @@ public class ShopServiceImpl implements ShopService {
 
         try {
             shopRepository.insert(entity);
-        }catch (DuplicateKeyException exception){
+        } catch (DuplicateKeyException exception) {
             throw new DuplicateKeyException("slug already exists");
         }
 
@@ -57,14 +60,28 @@ public class ShopServiceImpl implements ShopService {
 
     @Override
     public void deleteShop(String slug) {
-       shopRepository.deleteBySlug(slug);
+        shopRepository.deleteBySlug(slug);
     }
 
     @Override
     public List<ShopSummaryResponse> getAll() {
         List<ShopEntity> shopEntities = shopRepository.findAll();
 
-       return shopMapper.toSummaryList(shopEntities);
+        return shopMapper.toSummaryList(shopEntities);
+    }
+
+    @Override
+    public PageResponse<ShopSummaryResponse> getAllPageable(Pageable pageable) {
+        Page<ShopEntity> shop = shopRepository.findAll(pageable);
+        List<ShopSummaryResponse> content = shop.map(shopMapper::toSummary).getContent();
+
+        return new PageResponse<>(
+                content,
+                shop.getTotalElements(),
+                shop.getNumber(),
+                shop.getSize(),
+                shop.hasNext()
+        );
     }
 
     @Override
