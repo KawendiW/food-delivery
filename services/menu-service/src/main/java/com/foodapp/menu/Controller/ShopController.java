@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponentsBuilder;
-
 import java.net.URI;
 
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ import java.net.URI;
 public class ShopController {
 
     private final ShopService shopService;
-
+  
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ShopSummaryResponse> createShop(@Valid @RequestBody ShopCreateRequest request) {
         ShopSummaryResponse shop = shopService.createShop(request);
@@ -54,7 +53,5 @@ public class ShopController {
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
-
     }
-
 }
