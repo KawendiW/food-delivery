@@ -1,11 +1,14 @@
 package com.foodapp.menu.Controller;
 
+import com.foodapp.menu.Controller.DTO.PageResponse;
 import com.foodapp.menu.Controller.DTO.ShopCreateRequest;
 import com.foodapp.menu.Controller.DTO.ShopSummaryResponse;
 import com.foodapp.menu.Controller.DTO.ShopUpdateRequest;
 import com.foodapp.menu.Service.ShopService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,24 @@ import java.net.URI;
 public class ShopController {
 
     private final ShopService shopService;
+
+    @GetMapping()
+    public ResponseEntity<PageResponse<ShopSummaryResponse>> getAllShop(@PageableDefault(size = 20) Pageable pageable) {
+        PageResponse<ShopSummaryResponse> shop = shopService.getAllPageable(pageable);
+
+        return ResponseEntity
+                .ok(shop);
+    }
+
+
+    @GetMapping("/{slug}")
+    public ResponseEntity<ShopSummaryResponse> getShopBySlug(@PathVariable String slug){
+        ShopSummaryResponse shop = shopService.getBySlug(slug);
+
+        return ResponseEntity
+                .ok(shop);
+    }
+
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ShopSummaryResponse> createShop(@Valid @RequestBody ShopCreateRequest request) {
@@ -54,5 +75,7 @@ public class ShopController {
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
+
     }
+
 }
