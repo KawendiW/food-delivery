@@ -1,9 +1,143 @@
 name: ci
 on:
-  push:
   pull_request:
+  push:
+    branches: [ main ]
+
 jobs:
-  ci-summary:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      order: ${{ steps.filter.outputs.order }}
+      menu:  ${{ steps.filter.outputs.menu }}
+      cart:  ${{ steps.filter.outputs.cart }}
+      payment: ${{ steps.filter.outputs.payment }}
+      delivery: ${{ steps.filter.outputs.delivery }}
+      notify: ${{ steps.filter.outputs.notify }}
+      auth: ${{ steps.filter.outputs.auth }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      platform: ${{ steps.filter.outputs.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          filters: |
+            platform:
+              - 'platform/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+              - 'gradle/**'
+            order:
+              - 'services/order-service/**'
+              - 'platform/**'
+            menu:
+              - 'services/menu-service/**'
+              - 'platform/**'
+            cart:
+              - 'services/cart-service/**'
+              - 'platform/**'
+            payment:
+              - 'services/payment-service/**'
+              - 'platform/**'
+            delivery:
+              - 'services/delivery-service/**'
+              - 'platform/**'
+            notify:
+              - 'services/notification-service/**'
+              - 'platform/**'
+            auth:
+              - 'services/auth-service/**'
+              - 'platform/**'
+            gateway:
+              - 'services/api-gateway/**'
+              - 'platform/**'
+
+  build-order:
+    needs: changes
+    if: ${{ needs.changes.outputs.order == 'true' || needs.changes.outputs.platform == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "ok"
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build order-service
+        run: ./gradlew :services:order-service:build --stacktrace
+
+  build-menu:
+    needs: changes
+    if: ${{ needs.changes.outputs.menu == 'true' || needs.changes.outputs.platform == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build menu-service
+        run: ./gradlew :services:menu-service:build --stacktrace
+        
+  build-cart:
+    needs: changes
+    if: ${{ needs.changes.outputs.cart == 'true' || needs.changes.outputs.platform == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build menu-service
+        run: ./gradlew :services:cart-service:build --stacktrace
+
+  build-payment:
+    needs: changes
+    if: ${{ needs.changes.outputs.payment == 'true' || needs.changes.outputs.platform == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build menu-service
+        run: ./gradlew :services:payment-service:build --stacktrace
+        
+  build-delivery:
+    needs: changes
+    if: ${{ needs.changes.outputs.delivery == 'true' || needs.changes.outputs.platform == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build menu-service
+        run: ./gradlew :services:delivery-service:build --stacktrace
+
+  build-notify:
+    needs: changes
+    if: ${{ needs.changes.outputs.notify == 'true' || needs.changes.outputs.platform == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build menu-service
+        run: ./gradlew :services:notification-service:build --stacktrace
+        
+  auth-notify:
+    needs: changes
+    if: ${{ needs.changes.outputs.auth == 'true' || needs.changes.outputs.platform == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build menu-service
+        run: ./gradlew :services:auth-service:build --stacktrace
+        
+  gateway-notify:
+    needs: changes
+    if: ${{ needs.changes.outputs.gateway == 'true' || needs.changes.outputs.platform == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: 'temurin', java-version: '21' }
+      - name: Build menu-service
+        run: ./gradlew :services:api-gateway:build --stacktrace
