@@ -17,4 +17,6 @@ public interface ProductRepository extends MongoRepository<ProductEntity, String
     boolean existsBySku(String s);
 
     void deleteByShopIdAndSku(String shopId, String sku);
+
+    Page<ProductEntity> findAllByShopId(String shopId, Pageable pageable);
 }

@@ -1,16 +1,17 @@
 package com.foodapp.menu.Service.Impl;
 
-import com.foodapp.menu.Controller.DTO.ProductCreateRequest;
-import com.foodapp.menu.Controller.DTO.ProductSummaryResponse;
-import com.foodapp.menu.Controller.DTO.ProductUpdateRequest;
+import com.foodapp.menu.Controller.DTO.*;
 import com.foodapp.menu.Entity.ProductEntity;
 import com.foodapp.menu.Entity.ShopEntity;
 import com.foodapp.menu.MapStruct.ProductMapper;
+import com.foodapp.menu.MapStruct.ShopMapper;
 import com.foodapp.menu.Repository.ProductRepository;
 import com.foodapp.menu.Repository.ShopRepository;
 import com.foodapp.menu.Service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ShopRepository shopRepository;
     private final ProductMapper productMapper;
+    private final ShopMapper shopMapper;
 
     @Override
     public ProductSummaryResponse createProduct(String shopSlug, ProductCreateRequest request) {
@@ -74,6 +76,22 @@ public class ProductServiceImpl implements ProductService {
         List<ProductEntity> entities = productRepository.findAll();
 
         return productMapper.toSummaryList(entities);
+    }
+
+    @Override
+    public PageResponse<ProductSummaryResponse> getAllPageable(String shopSlug, Pageable pageable) {
+        String shopId = shopRepository.findBySlug(shopSlug).orElseThrow().getId();
+
+        Page<ProductEntity> product = productRepository.findAllByShopId(shopId, pageable);
+        List<ProductSummaryResponse> content = product.map(productMapper::toSummary).getContent();
+
+        return new PageResponse<>(
+                content,
+                product.getTotalElements(),
+                product.getNumber(),
+                product.getSize(),
+                product.hasNext()
+        );
     }
 
     @Override
