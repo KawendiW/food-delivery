@@ -3,6 +3,7 @@ package com.foodapp.menu.Controller;
 import com.foodapp.menu.Controller.DTO.PageResponse;
 import com.foodapp.menu.Controller.DTO.ProductCreateRequest;
 import com.foodapp.menu.Controller.DTO.ProductSummaryResponse;
+import com.foodapp.menu.Controller.DTO.ProductUpdateRequest;
 import com.foodapp.menu.Service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -57,5 +58,15 @@ public class ProductController {
         return ResponseEntity
                 .created(location)
                 .body(product);
+    }
+
+    @PatchMapping(value = "/{sku}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProductSummaryResponse> updateProduct(@PathVariable String shopSlug,
+                                                                @PathVariable String sku,
+                                                                @Valid @RequestBody ProductUpdateRequest request) {
+        ProductSummaryResponse product = productService.updateProduct(shopSlug, sku, request);
+
+        return ResponseEntity
+                .ok(product);
     }
 }
