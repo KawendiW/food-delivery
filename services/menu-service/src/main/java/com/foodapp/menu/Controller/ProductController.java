@@ -32,12 +32,30 @@ public class ProductController {
                 .ok(product);
     }
 
-    @GetMapping("/{shopSlug}/{sku}")
+    @GetMapping("/{sku}")
     public ResponseEntity<ProductSummaryResponse> getProductBySku(@PathVariable String shopSlug,
-                                                                  @PathVariable String sku){
+                                                                  @PathVariable String sku) {
         ProductSummaryResponse product = productService.getBySku(shopSlug, sku);
 
         return ResponseEntity
                 .ok(product);
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ProductSummaryResponse> createProduct(@PathVariable String shopSlug,
+                                                                @Valid @RequestBody ProductCreateRequest request) {
+
+        ProductSummaryResponse product = productService.createProduct(shopSlug, request);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{sku}")
+                .buildAndExpand(product.getSku())
+                .toUri();
+
+
+        return ResponseEntity
+                .created(location)
+                .body(product);
     }
 }
