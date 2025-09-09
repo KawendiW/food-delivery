@@ -29,4 +29,13 @@ public class ProductController {
         return ResponseEntity
                 .ok(product);
     }
+
+    @GetMapping("/{shopSlug}/{sku}")
+    public ResponseEntity<ProductSummaryResponse> getProductBySku(@PathVariable String shopSlug,
+                                                                  @PathVariable String sku){
+        ProductSummaryResponse product = productService.getBySku(shopSlug, sku);
+
+        return ResponseEntity
+                .ok(product);
+    }
 }
