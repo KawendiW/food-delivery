@@ -99,7 +99,7 @@ public class ProductServiceImpl implements ProductService {
             cacheNames = "productsPage",
             key = "#shopSlug + '::' + #pageable.pageNumber + '::' + #pageable.pageSize + '::' + #pageable.sort",
             condition = "#pageable.pageNumber < 5 && #pageable.pageSize <= 50",
-            unless = "#result == null || #result.content().isEmpty()"
+            unless = "#result == null || #result.content == null || #result.content.isEmpty()"
     )
     public PageResponse<ProductSummaryResponse> getAllPageable(String shopSlug, Pageable pageable) {
         String shopId = shopRepository.findBySlug(shopSlug).orElseThrow().getId();
