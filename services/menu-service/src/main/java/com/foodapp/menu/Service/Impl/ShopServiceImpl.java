@@ -9,6 +9,7 @@ import com.foodapp.menu.MapStruct.ShopMapper;
 import com.foodapp.menu.Repository.ShopRepository;
 import com.foodapp.menu.Service.ShopService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -120,4 +121,15 @@ public class ShopServiceImpl implements ShopService {
 
         return x;
     }
+
+
+    @Cacheable(
+            cacheNames = "shopIdBySlug",
+            key = "#slug",
+            unless = "#result == null"
+    )
+    public String getIdBySlug(String slug) {
+        return shopRepository.findBySlug(slug).map(ShopEntity::getId).orElse(null);
+    }
+
 }

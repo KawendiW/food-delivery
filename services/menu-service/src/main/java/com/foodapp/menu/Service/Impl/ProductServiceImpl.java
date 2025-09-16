@@ -2,13 +2,15 @@ package com.foodapp.menu.Service.Impl;
 
 import com.foodapp.menu.Controller.DTO.*;
 import com.foodapp.menu.Entity.ProductEntity;
-import com.foodapp.menu.Entity.ShopEntity;
 import com.foodapp.menu.MapStruct.ProductMapper;
-import com.foodapp.menu.MapStruct.ShopMapper;
 import com.foodapp.menu.Repository.ProductRepository;
 import com.foodapp.menu.Repository.ShopRepository;
 import com.foodapp.menu.Service.ProductService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,13 +24,18 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
+    private final ShopServiceImpl shopService;
     private final ShopRepository shopRepository;
     private final ProductMapper productMapper;
-    private final ShopMapper shopMapper;
 
     @Override
+    @Caching(
+            put   = @CachePut(cacheNames = "productBySku",
+                    key = "#shopSlug + '::' + #result.sku"),
+            evict = @CacheEvict(cacheNames = "productsPage", allEntries = true)
+    )
     public ProductSummaryResponse createProduct(String shopSlug, ProductCreateRequest request) {
-        String shopId = getShopId(shopSlug);
+        String shopId = shopService.getIdBySlug(shopSlug);
 
         String slugify = slugify(request.getTitle());
         String sku = ensureUniqueSku(slugify);
@@ -55,8 +62,13 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
+    @Caching(
+            put   = @CachePut(cacheNames = "productBySku",
+                    key = "#shopSlug + '::' + #sku"),
+            evict = @CacheEvict(cacheNames = "productsPage", allEntries = true)
+    )
     public ProductSummaryResponse updateProduct(String shopSlug, String sku, ProductUpdateRequest request) {
-        String shopId = getShopId(shopSlug);
+        String shopId = shopService.getIdBySlug(shopSlug);
         ProductEntity entity = productRepository.findByShopIdAndSku(shopId, sku).orElseThrow();
 
         productMapper.update(entity, request);
@@ -66,8 +78,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "productBySku", key = "#shopSlug + '::' + #sku"),
+            @CacheEvict(cacheNames = "productsPage", allEntries = true)
+    })
     public void deleteProduct(String shopSlug, String sku) {
-        String shopId = getShopId(shopSlug);
+        String shopId = shopService.getIdBySlug(shopSlug);
         productRepository.deleteByShopIdAndSku(shopId, sku);
     }
 
@@ -79,6 +95,12 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(
+            cacheNames = "productsPage",
+            key = "#shopSlug + '::' + #pageable.pageNumber + '::' + #pageable.pageSize + '::' + #pageable.sort",
+            condition = "#pageable.pageNumber < 5 && #pageable.pageSize <= 50",
+            unless = "#result == null || #result.content().isEmpty()"
+    )
     public PageResponse<ProductSummaryResponse> getAllPageable(String shopSlug, Pageable pageable) {
         String shopId = shopRepository.findBySlug(shopSlug).orElseThrow().getId();
 
@@ -95,17 +117,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    @Cacheable(cacheNames = "productBySku",
+            key = "#shopSlug + '::' + #sku",
+            unless = "#result == null")
     public ProductSummaryResponse getBySku(String shopSlug, String sku) {
-        String shopId = getShopId(shopSlug);
+        String shopId = shopService.getIdBySlug(shopSlug);
         ProductEntity entity = productRepository.findByShopIdAndSku(shopId, sku).orElseThrow();
 
         return productMapper.toSummary(entity);
-    }
-
-
-    private String getShopId(String shopSlug) {
-        ShopEntity shop = shopRepository.findBySlug(shopSlug).orElseThrow();
-        return shop.getId();
     }
 
     private String ensureUniqueSku(String sku) {

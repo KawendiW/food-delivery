@@ -12,8 +12,11 @@ spring:
       uri: mongodb://localhost:27017/food_menu
       auto-index-creation: true
       uuid-representation: standard
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
   cache:
-    type: none
+    type: redis
   jpa:
     show-sql: true
 mongock:
