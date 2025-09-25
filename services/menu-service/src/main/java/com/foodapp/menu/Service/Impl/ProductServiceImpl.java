@@ -6,6 +6,7 @@ import com.foodapp.menu.MapStruct.ProductMapper;
 import com.foodapp.menu.Repository.ProductRepository;
 import com.foodapp.menu.Repository.ShopRepository;
 import com.foodapp.menu.Service.ProductService;
+import com.foodapp.menu.Service.ShopService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
@@ -24,13 +25,13 @@ import java.util.UUID;
 public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
-    private final ShopServiceImpl shopService;
+    private final ShopService shopService;
     private final ShopRepository shopRepository;
     private final ProductMapper productMapper;
 
     @Override
     @Caching(
-            put   = @CachePut(cacheNames = "productBySku",
+            put = @CachePut(cacheNames = "productBySku",
                     key = "#shopSlug + '::' + #result.sku"),
             evict = @CacheEvict(cacheNames = "productsPage", allEntries = true)
     )
@@ -63,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     @Caching(
-            put   = @CachePut(cacheNames = "productBySku",
+            put = @CachePut(cacheNames = "productBySku",
                     key = "#shopSlug + '::' + #sku"),
             evict = @CacheEvict(cacheNames = "productsPage", allEntries = true)
     )

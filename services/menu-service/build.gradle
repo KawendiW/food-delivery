@@ -15,9 +15,8 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation platform('org.testcontainers:testcontainers-bom:1.20.1')
+    testImplementation platform('org.testcontainers:testcontainers-bom:1.21.3')
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:mongodb'
-    testImplementation 'org.testcontainers:redis'
-
+    testImplementation 'org.testcontainers:testcontainers'
 }
