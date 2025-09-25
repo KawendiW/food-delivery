@@ -93,6 +93,16 @@ public class ShopServiceImpl implements ShopService {
     }
 
 
+    @Override
+    @Cacheable(
+            cacheNames = "shopIdBySlug",
+            key = "#slug",
+            unless = "#result == null"
+    )
+    public String getIdBySlug(String slug) {
+        return shopRepository.findBySlug(slug).map(ShopEntity::getId).orElse(null);
+    }
+
     private String ensureUniqueSlug(String slug) {
         String s = slug;
         int i = 2;
@@ -122,14 +132,5 @@ public class ShopServiceImpl implements ShopService {
         return x;
     }
 
-
-    @Cacheable(
-            cacheNames = "shopIdBySlug",
-            key = "#slug",
-            unless = "#result == null"
-    )
-    public String getIdBySlug(String slug) {
-        return shopRepository.findBySlug(slug).map(ShopEntity::getId).orElse(null);
-    }
 
 }

@@ -21,4 +21,6 @@ public interface ShopService {
     PageResponse<ShopSummaryResponse> getAllPageable(Pageable pageable);
 
     ShopSummaryResponse getBySlug(String slug);
+
+    String getIdBySlug(String slug);
 }
