@@ -1,4 +1,4 @@
-package com.foodapp.menu;
+package com.foodapp.menu.UnitTest;
 
 import com.foodapp.menu.Controller.DTO.PageResponse;
 import com.foodapp.menu.Controller.DTO.ProductCreateRequest;
