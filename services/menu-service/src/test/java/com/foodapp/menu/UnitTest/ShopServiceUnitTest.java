@@ -1,11 +1,11 @@
-package com.foodapp.menu;
+package com.foodapp.menu.UnitTest;
 
 import com.foodapp.menu.Controller.DTO.*;
 import com.foodapp.menu.Entity.ShopEntity;
 import com.foodapp.menu.MapStruct.ShopMapper;
 import com.foodapp.menu.Repository.ShopRepository;
 import com.foodapp.menu.Service.Impl.ShopServiceImpl;
-import com.foodapp.menu.fixtures.ShopMothers;
+import com.foodapp.menu.Fixtures.ShopMothers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
